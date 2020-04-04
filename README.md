@@ -4,4 +4,4 @@
 As a result, we don't need to keep the Real-Valued weights at all, 
 compared to all other methods. 
 
-### [PROTOTYPE] written in Python
+*[PROTOTYPE]* written in Python
