@@ -1,3 +1,6 @@
+#ifndef BINVEC
+#define BINVEC
+
 #include <cstdint>
 #include <vector>
 
@@ -34,6 +37,10 @@ public:
   //BinVec(std::vector<int> other);
 
   int operator* (const BinVec &) const;
-  friend int operator* (int bit, const BinVec & bit_vector);
+  BinVec operator+ (const BinVec &) const;
+  friend BinVec operator* (int bit, const BinVec & bit_vector);
+  friend int dot (int bit, const BinVec & bit_vector);
   IndexProxy operator[] (int idx);
 };
+
+#endif

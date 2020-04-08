@@ -128,7 +128,56 @@ int BinVec::operator* (const BinVec & other) const
   return dot;
 }
 
-int operator* (int bit, const BinVec & bit_vector)
+
+BinVec BinVec::operator+ (const BinVec & other) const
+{
+  if (num_of_bits != other.size())
+  {
+    throw std::length_error("Vectors in sum should have equal length!");
+  }
+
+  BinVec res(num_of_bits);
+  for (int i = 0; i < num_of_int_containers - 1; i++)
+  {
+    auto mask = mask_last(ISIZE);
+    res.bits[i] = mask & (bits[i] | other.bits[i]);
+  }
+  int i = num_of_int_containers - 1;
+  auto bits_num = num_of_bits % int_container_size;
+  auto mask = mask_last(bits_num);
+  res.bits[i] = mask & (bits[i] | other.bits[i]);
+
+  return res;
+}
+
+
+BinVec operator* (int bit, const BinVec & bit_vector)
+{
+  auto num_of_int_containers = bit_vector.num_of_int_containers;
+  auto bits = bit_vector.bits;
+  auto num_of_bits = bit_vector.num_of_bits;
+  auto int_container_size = bit_vector.int_container_size;
+
+  BinVec res(num_of_bits);
+
+  auto num_binary = 0; // set all-zeros
+  if (bit == 1) { num_binary = ITYPE(-1); } // set all-ones
+
+  for (int i = 0; i < num_of_int_containers - 1; i++)
+  {
+    auto mask = mask_last(ISIZE);
+    res.bits[i] = (mask & ~(bits[i] ^ num_binary)); // xnor
+  }
+  int i = num_of_int_containers - 1;
+  auto bits_num = num_of_bits % int_container_size;
+  auto mask = mask_last(bits_num);
+  res.bits[i] = (mask & ~(bits[i] ^ num_binary));
+
+  return res;
+}
+
+
+int dot (int bit, const BinVec & bit_vector)
 {
   auto num_of_int_containers = bit_vector.num_of_int_containers;
   auto bits = bit_vector.bits;
@@ -153,6 +202,7 @@ int operator* (int bit, const BinVec & bit_vector)
 
   return dot;
 }
+
 
 int BinVec::get_bit(int index) const
 {
