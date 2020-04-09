@@ -7,6 +7,11 @@
 #define ITYPE uint16_t
 #define ISIZE 16
 
+int sign(int val)
+{
+  return int(val >= 0);
+}
+
 class BinVec {
 
 private:

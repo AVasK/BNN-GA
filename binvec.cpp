@@ -11,15 +11,17 @@ ITYPE mask_last(int mask_on_bits)
   return ~(ITYPE(-1) >> mask_on_bits << mask_on_bits);
 }
 
-ITYPE left_ith_bit(int index) // from left to right
+ITYPE big_endian_ith_bit(int index) // [smaller->bigger]
 {
   return ITYPE(1 << (ISIZE - index - 1));
 }
 
-ITYPE ith_bit(int index) // from left to right
+ITYPE little_endian_ith_bit(int index) // [bigger->smaller]
 {
   return ITYPE(1 << index);
 }
+
+#define ith_bit little_endian_ith_bit
 
 inline unsigned pow_of_2 (int pow)
 {
@@ -97,6 +99,7 @@ std::ostream & operator<<(std::ostream & os, const BinVec & vec)
 }
 
 
+// The dot product between two BinVec's
 int BinVec::operator* (const BinVec & other) const
 {
   if (num_of_bits != other.size())
@@ -215,7 +218,7 @@ int BinVec::get_bit(int index) const
       (container_offset >= num_of_bits % int_container_size)
      )
   {
-    throw std::out_of_range("index out of range");
+    throw std::out_of_range("get_bit() index out of range");
   }
 
   auto container = bits[container_index];
@@ -235,7 +238,7 @@ void BinVec::set_bit(int value, int index)
       (container_offset >= num_of_bits % int_container_size)
      )
   {
-    throw std::out_of_range("index out of range");
+    throw std::out_of_range("set_bit() index out of range");
   }
 
   auto& container = bits[container_index];

@@ -4,26 +4,11 @@
 // - AVasK.
 
 
-// Example of representation
-// Layers: [2, 3, 1]
-//
-// Weights shapes per layer:
-// [ 2 x [3],
-//   3 x [1] ]
-//
-// Chromosome:
-// [9 bits]
-
 #include <iostream>
 #include <cmath>
-#include "binvec.hpp"
+#include "binvec.cpp"
+#include "binmat.hpp"
 #include "myMap.hpp"
-
-
-int sign(int val)
-{
-  return int(val >= 0);
-}
 
 
 float sigmoid(float val)
@@ -37,38 +22,13 @@ int threshold(float val)
 }
 
 
-template <typename T>
-BinVec dot (std::vector<T> activations, std::vector<BinVec> bin_vec)
-{
-  BinVec result = activations[0] * bin_vec[0];
-  for (int i = 1; i < activations.size(); i++)
-  {
-    std::cout << "res: " << result;
-    std::cout << " + " << activations[i] * bin_vec[i] << "\n";
-    result = result + activations[i] * bin_vec[i];
-    std::cout << " = " << result << "\n\n";
-  }
-  return result;
-}
-
-// BAD AND SILLY, FOR TESTING PURPOSES ONLY
-std::vector<int> to_vec(BinVec v)
-{
-  std::vector<int> res (v.size());
-  for (int i = 0; i < v.size(); i++)
-  {
-    res[i] = v[i];
-  }
-  return res;
-}
-
 
 class BNN {
 
 private:
 
   std::vector<int> layers;
-  std::vector< std::vector<BinVec> > weights_per_layer;
+  std::vector<BinMat> weights;
 
 public:
 
@@ -77,37 +37,26 @@ public:
     layers = _layers;
     for (int i = 0; i < layers.size()-1; i++)
     {
-      std::vector<BinVec> layer_weights (layers[i], BinVec(0)); // BinVec(0) is a placeholder
-      for (auto & elem : layer_weights)
-      {
-        elem = BinVec(layers[i+1]); // the real initialization
-      }
-      weights_per_layer.push_back(layer_weights);
+      auto input_size = layers[i];
+      auto output_size = layers[i+1];
+      auto weights_per_layer = BinMat(input_size, output_size);
+      weights.push_back(weights_per_layer);
     }
   }
 
 
   friend std::ostream & operator<< (std::ostream &os, const BNN & net)
   {
-    for (int layer_idx = 0; layer_idx < net.weights_per_layer.size(); layer_idx++)
-    {
-      auto layer_weights = net.weights_per_layer[layer_idx];
-
-      os << "Weights between layers " << layer_idx
-         << " and " << layer_idx+1 << "\n";
-
-      for (auto elem : layer_weights)
-      {
-        os << elem << "\n";
-      }
-    }
+    for (const auto & layer_size : net.layers) os << layer_size << ", ";
+    os << "\nweights:\n";
+    for (const auto & weight_mat : net.weights) os << weight_mat << "\n";
     return os;
   }
 
 
   std::vector<float> forward(std::vector<int> input)
   {
-
+    return std::vector<float>({1,2,3});
   }
 
 

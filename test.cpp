@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "binvec.cpp"
+#include "binvec.hpp"
+#include "binmat.hpp"
 #include "BNN.hpp"
 
 int main()
@@ -24,7 +25,23 @@ int main()
   std::cout << "\n";
   */
 
-  auto net = BNN(std::vector<int>({2,3,1}));
-  std::cout << net;
+  auto bv = BinVec(2);
+  std::cout << bv << "\n*\n";
+
+  auto mat = BinMat(2, 3);
+  std::cout << mat << "\n";
+  std::cout << "total #weights = " << mat.size() << "\n";
+
+  std::cout << "\n=\n" << bv*mat << "\n";
+  std::cout << realValuedDot(bv, mat) << "\n";
+
+  for (int idx=0; idx<3; idx++)
+  {
+    std::cout << (bv*mat)[idx] << " ";
+  }
+
+
+  //auto net = BNN(std::vector<int>({2,3,1}));
+  //std::cout << net;
   //net.forward(std::vector<int>({1,-1}));
 }
