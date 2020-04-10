@@ -102,7 +102,7 @@ public:
     {
       for (auto& col : mat.columns)
       {
-        os << " " << col.get_bit(row);
+        os << " " << col[row];
       }
       os << "\n";
     }

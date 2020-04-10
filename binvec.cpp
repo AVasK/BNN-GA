@@ -34,7 +34,7 @@ std::string to_binary(int num, int bits=ISIZE)
 
   for ( int i = bits-1; i >= 0; i-- )
   {
-    binary_string[i] = int(num & 1)+'0';
+    binary_string[bits-i-1] = int(num & 1)+'0';
     num = num >> 1;
   }
   return binary_string;
@@ -251,6 +251,11 @@ void BinVec::set_bit(int value, int index)
   // set bit
   else
   container = container | bitmask;
+}
+
+int BinVec::operator[] (int idx) const
+{
+  return get_bit(idx);
 }
 
 BinVec::IndexProxy BinVec::operator[] (int idx)

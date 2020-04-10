@@ -46,6 +46,7 @@ public:
   friend BinVec operator* (int bit, const BinVec & bit_vector);
   friend int dot (int bit, const BinVec & bit_vector);
   IndexProxy operator[] (int idx);
+  int operator[] (int idx) const;
 };
 
 #endif
