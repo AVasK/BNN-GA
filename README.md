@@ -10,4 +10,3 @@ Written core binary operations & classes in C++:
 - Binary Vector (BinVec) stores binary activations space-efficiently, uses popcount & xnor ops for dot product
 - Binary Matrix (BinMat) stores columns of binary vectors for efficient (hopefully, needs testing) (activations * weights) multiplication
 
-- supports binary vectors with effective storage & binary operations
