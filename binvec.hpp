@@ -39,6 +39,7 @@ public:
 
   BinVec(unsigned long length);
   BinVec(unsigned long length, int with_bit);
+  friend BinVec BinFromVec(std::vector<int> bits);
   //BinVec(std::vector<int> other);
 
   int operator* (const BinVec &) const;

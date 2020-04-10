@@ -13,7 +13,7 @@
 
 float sigmoid(float val)
 {
-  return 1 / (1+exp(-val));
+  return 1.0 / (1.0+exp(-val));
 }
 
 int threshold(float val)
@@ -54,9 +54,18 @@ public:
   }
 
 
-  std::vector<float> forward(std::vector<int> input)
+  float forward(std::vector<int> input)
   {
-    return std::vector<float>({1,2,3});
+    auto activations = BinFromVec(input);
+    std::cout << "activations: "<< activations << "\n";
+    for (int i = 0; i < weights.size() - 1; i++)
+    {
+      activations = activations * weights[i];
+      std::cout << "activations: "<< activations << "\n";
+    }
+    int i = weights.size() - 1;
+    std::cout << realValuedDot(activations, weights[i])[0] << "\n";
+    return sigmoid(realValuedDot(activations, weights[i])[0]);
   }
 
 

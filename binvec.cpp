@@ -81,6 +81,20 @@ BinVec::BinVec(unsigned long length, int bit)
   }
 }
 
+
+// not the fastest way,
+// used only to convert input to BinVec
+BinVec BinFromVec(std::vector<int> bits)
+{
+  auto v = BinVec(bits.size(), 0);
+  for (long i = 0; i < bits.size(); i++)
+  {
+    v[i] = sign(bits[i]);
+  }
+  return v;
+}
+
+
 std::ostream & operator<<(std::ostream & os, const BinVec & vec)
 {
   os << "b[";

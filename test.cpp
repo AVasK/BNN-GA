@@ -45,7 +45,7 @@ int main()
   }
 
 
-  auto net = BNN(std::vector<int>({2,3,1}));
+  auto net = BNN(std::vector<int>({2,200,200,1}));
   std::cout << net;
-  //net.forward(std::vector<int>({1,-1}));
+  std::cout << net.forward(std::vector<int>({1,-1}));
 }
