@@ -8,7 +8,7 @@
 
 ITYPE mask_last(int mask_on_bits)
 {
-  return ~(ITYPE(-1) >> mask_on_bits << mask_on_bits);
+  return ~(ITYPE(-1) << mask_on_bits);
 }
 
 ITYPE big_endian_ith_bit(int index) // [smaller->bigger]
@@ -28,7 +28,7 @@ inline unsigned pow_of_2 (int pow)
   return 1 << pow;
 }
 
-std::string to_binary(int num, int bits=ISIZE)
+std::string to_binary(ITYPE num, int bits=ISIZE)
 {
   std::string binary_string(bits, 'x');
 
@@ -40,7 +40,7 @@ std::string to_binary(int num, int bits=ISIZE)
   return binary_string;
 }
 
-char BinVec::size() const
+unsigned long BinVec::size() const
 {
   return num_of_bits;
 }
@@ -54,7 +54,7 @@ void init_srand()
   }
 }
 
-BinVec::BinVec(int length)
+BinVec::BinVec(unsigned long length)
 {
   num_of_bits = length;
   num_of_int_containers = (length / int_container_size) + 1;
@@ -67,12 +67,12 @@ BinVec::BinVec(int length)
   }
 }
 
-BinVec::BinVec(int length, int bit)
+BinVec::BinVec(unsigned long length, int bit)
 {
   num_of_bits = length;
   num_of_int_containers = (length / int_container_size) + 1;
 
-  auto num = 0;
+  ITYPE num = 0;
   if (bit == 1) num = ITYPE(-1);
   // Zeroed out init
   for ( int i = 0; i < num_of_int_containers; i++ )
@@ -87,7 +87,7 @@ std::ostream & operator<<(std::ostream & os, const BinVec & vec)
   for ( int i = 0; i < vec.num_of_int_containers - 1; i++ )
   {
       auto num = vec.bits[i];
-      os << to_binary(num) << ",";
+      os << to_binary(num) << "|";
   }
   int i = vec.num_of_int_containers - 1;
   auto num = vec.bits[i];
@@ -116,13 +116,13 @@ int BinVec::operator* (const BinVec & other) const
   // since in most papers they just say it's popcount(xnor), which it's not..
 
   int dot = 0;
-  for (int i = 0; i < num_of_int_containers - 1; i++)
+  for (unsigned long i = 0; i < num_of_int_containers - 1; i++)
   {
     auto mask = mask_last(ISIZE);
     auto popcnt = __builtin_popcount(mask & ~(bits[i] ^ other.bits[i])); // popcount(xnor)
     dot += (popcnt << 1) - ISIZE;
   }
-  int i = num_of_int_containers - 1;
+  unsigned long i = num_of_int_containers - 1;
   auto bits_num = num_of_bits % int_container_size;
   auto mask = mask_last(bits_num);
   auto popcnt = __builtin_popcount(mask & ~(bits[i] ^ other.bits[i]));
@@ -163,15 +163,15 @@ BinVec operator* (int bit, const BinVec & bit_vector)
 
   BinVec res(num_of_bits);
 
-  auto num_binary = 0; // set all-zeros
+  ITYPE num_binary = 0; // set all-zeros
   if (bit == 1) { num_binary = ITYPE(-1); } // set all-ones
 
-  for (int i = 0; i < num_of_int_containers - 1; i++)
+  for (long i = 0; i < num_of_int_containers - 1; i++)
   {
     auto mask = mask_last(ISIZE);
     res.bits[i] = (mask & ~(bits[i] ^ num_binary)); // xnor
   }
-  int i = num_of_int_containers - 1;
+  long i = num_of_int_containers - 1;
   auto bits_num = num_of_bits % int_container_size;
   auto mask = mask_last(bits_num);
   res.bits[i] = (mask & ~(bits[i] ^ num_binary));
@@ -187,8 +187,8 @@ int dot (int bit, const BinVec & bit_vector)
   auto num_of_bits = bit_vector.num_of_bits;
   auto int_container_size = bit_vector.int_container_size;
 
-  int dot = 0;
-  auto num_binary = 0; // set all-zeros
+  long dot = 0;
+  ITYPE num_binary = 0; // set all-zeros
   if (bit == 1) { num_binary = ITYPE(-1); } // set all-ones
 
   for (int i = 0; i < num_of_int_containers - 1; i++)
@@ -207,15 +207,15 @@ int dot (int bit, const BinVec & bit_vector)
 }
 
 
-int BinVec::get_bit(int index) const
+int BinVec::get_bit(unsigned long index) const
 {
-  auto container_index = int(index / int_container_size);
+  auto container_index = index / int_container_size;
   auto container_offset = index % int_container_size;
 
   if (
-      (container_index >= num_of_int_containers)
-       ||
-      (container_offset >= num_of_bits % int_container_size)
+      (container_index >= num_of_int_containers) ||
+      ((container_index == num_of_int_containers - 1)
+          && (container_offset >= (num_of_bits % int_container_size)))
      )
   {
     throw std::out_of_range("get_bit() index out of range");
@@ -227,15 +227,22 @@ int BinVec::get_bit(int index) const
 }
 
 
-void BinVec::set_bit(int value, int index)
+void BinVec::set_bit(int value, unsigned long index)
 {
-  auto container_index = int(index / int_container_size);
-  auto container_offset = index % int_container_size;
+  unsigned long container_index = index / int_container_size;
+  int container_offset = index % int_container_size;
+
+  /*
+  std::cerr << "cidx " << container_index << "\n"
+            << "coff " << container_offset << "\n"
+            << "idx " << index << "\n"
+            << "#con " << num_of_int_containers << "\n"
+            << "#bits " << num_of_bits << "\n";
+  */
 
   if (
-      (container_index >= num_of_int_containers)
-       ||
-      (container_offset >= num_of_bits % int_container_size)
+      (container_index >= num_of_int_containers) ||
+      ((container_index == num_of_int_containers - 1) && (container_offset >= (num_of_bits % int_container_size)))
      )
   {
     throw std::out_of_range("set_bit() index out of range");
@@ -253,12 +260,13 @@ void BinVec::set_bit(int value, int index)
   container = container | bitmask;
 }
 
-int BinVec::operator[] (int idx) const
+
+int BinVec::operator[] (unsigned long idx) const
 {
   return get_bit(idx);
 }
 
-BinVec::IndexProxy BinVec::operator[] (int idx)
+BinVec::IndexProxy BinVec::operator[] (unsigned long idx)
 {
   return IndexProxy(*this, idx);
 }

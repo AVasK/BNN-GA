@@ -19,16 +19,16 @@ class BinMat
 {
 private:
   std::vector<BinVec> columns;
-  int _num_columns;
+  unsigned long _num_columns;
 
 public:
   // initialize with vec of columns
   BinMat(std::vector<BinVec> cols) : columns(cols), _num_columns(cols.size()) {}
 
   // random init
-  BinMat(int n_rows, int n_cols) : _num_columns(n_cols)
+  BinMat(unsigned long n_rows, unsigned long n_cols) : _num_columns(n_cols)
   {
-    for (int col = 0; col < n_cols; col++)
+    for (unsigned long col = 0; col < n_cols; col++)
     {
       columns.push_back(BinVec(n_rows));
     }
@@ -42,10 +42,10 @@ public:
   }
 
 
-  int n_rows() const { return columns[0].size(); }
+  unsigned long n_rows() const { return columns[0].size(); }
 
 
-  int size() const {
+  unsigned long long size() const {
     return _num_columns * n_rows();
   }
 
@@ -53,16 +53,15 @@ public:
   // BinVec * BinMat -> BinVec
   friend BinVec operator* (BinVec activations, const BinMat & weights)
   {
-    auto _binvec_size = weights.n_rows();
-
     // dimm-check
+    auto _binvec_size = weights.n_rows();
     if (_binvec_size != activations.size())
     {
       throw std::length_error("Dimmensions are off");
     }
 
     BinVec new_activations (weights._num_columns, 0); // zero binvec
-    int i = 0;
+    unsigned long i = 0;
     for (auto& weight_vector : weights.columns)
     {
       new_activations[i++] = sign(activations * weight_vector);
@@ -84,7 +83,7 @@ public:
     }
 
     std::vector<int> new_activations (weights._num_columns, 0);
-    int i = 0;
+    unsigned long i = 0;
     for (auto& weight_vector : weights.columns)
     {
       new_activations[i++] = activations * weight_vector;
@@ -98,7 +97,7 @@ public:
   // so, don't do that.
   friend std::ostream & operator<< (std::ostream & os, const BinMat & mat)
   {
-    for (int row = 0; row < mat.n_rows(); row++)
+    for (unsigned long row = 0; row < mat.n_rows(); row++)
     {
       for (auto& col : mat.columns)
       {

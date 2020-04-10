@@ -25,15 +25,19 @@ int main()
   std::cout << "\n";
   */
 
-  auto bv = BinVec(2);
+  std::cout << "mask: " << to_binary(mask_last(4), 32) << "\n";
+
+  auto bv = BinVec(3);
   std::cout << bv << "\n*\n";
 
-  auto mat = BinMat(2, 3);
+  auto mat = BinMat(3, 3);
   std::cout << mat << "\n";
   std::cout << "total #weights = " << mat.size() << "\n";
-
-  std::cout << "\n=\n" << bv*mat << "\n";
-  std::cout << realValuedDot(bv, mat) << "\n";
+  auto res = bv*mat;
+  std::cout << "done\n";
+  std::cout << res << " " << res.size() << "\n";
+  //std::cout << "\n=\n" << bv*mat << "\n";
+  //std::cout << realValuedDot(bv, mat) << "\n";
 
   for (int idx=0; idx<3; idx++)
   {
@@ -41,7 +45,7 @@ int main()
   }
 
 
-  //auto net = BNN(std::vector<int>({2,3,1}));
-  //std::cout << net;
+  auto net = BNN(std::vector<int>({2,3,1}));
+  std::cout << net;
   //net.forward(std::vector<int>({1,-1}));
 }
