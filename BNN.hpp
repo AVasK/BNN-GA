@@ -44,6 +44,18 @@ public:
     }
   }
 
+  // Naive implementation, may be slow
+  // BinVec weightsToBinVec()
+
+  unsigned long size() const
+  {
+    unsigned long sum = 0;
+    for (const auto & weight : weights)
+    {
+      sum += weight.size();
+    }
+    return sum;
+  }
 
   friend std::ostream & operator<< (std::ostream &os, const BNN & net)
   {
@@ -54,14 +66,14 @@ public:
   }
 
 
-  float forward(std::vector<int> input)
+  float forward(std::vector<int> input) const
   {
     auto activations = BinFromVec(input);
-    std::cout << "activations: "<< activations << "\n";
+    //std::cout << "activations: "<< activations << "\n";
     for (int i = 0; i < weights.size() - 1; i++)
     {
       activations = activations * weights[i];
-      std::cout << "activations: "<< activations << "\n";
+      //std::cout << "activations: "<< activations << "\n";
     }
     int i = weights.size() - 1;
     std::cout << realValuedDot(activations, weights[i])[0] << "\n";

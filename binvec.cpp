@@ -112,7 +112,7 @@ std::ostream & operator<<(std::ostream & os, const BinVec & vec)
   return os;
 }
 
-
+/*
 // The dot product between two BinVec's
 int BinVec::operator* (const BinVec & other) const
 {
@@ -124,7 +124,7 @@ int BinVec::operator* (const BinVec & other) const
   // in binary vectors we can replace usual Multiply-Accumulate (MAC) operation
   // in dot products
   // with this formula:
-  //    dot = 2*popcount( xnor(V1, V2) )
+  //    dot = 2*popcount( xnor(V1, V2) ) - N
   //
   // That's a little bit trickier,
   // since in most papers they just say it's popcount(xnor), which it's not..
@@ -143,6 +143,39 @@ int BinVec::operator* (const BinVec & other) const
   dot += (popcnt << 1) - bits_num;
 
   return dot;
+}
+*/
+
+
+int BinVec::operator* (const BinVec & other) const
+{
+  if (num_of_bits != other.size())
+  {
+    throw std::length_error("Vectors in dot product should have equal length!");
+  }
+
+  // in binary vectors we can replace usual Multiply-Accumulate (MAC) operation
+  // in dot products
+  // with this formula:
+  //    dot = 2*popcount( xnor(V1, V2) ) - N
+  //
+  // That's a little bit trickier,
+  // since in most papers they just say it's popcount(xnor), which it's not..
+
+  int pops = 0;
+  for (unsigned long i = 0; i < num_of_int_containers - 1; i++)
+  {
+    auto mask = mask_last(ISIZE);
+    auto popcnt = __builtin_popcount(mask & ~(bits[i] ^ other.bits[i])); // popcount(xnor)
+    pops += popcnt;
+  }
+  unsigned long i = num_of_int_containers - 1;
+  auto bits_num = num_of_bits % int_container_size;
+  auto mask = mask_last(bits_num);
+  auto popcnt = __builtin_popcount(mask & ~(bits[i] ^ other.bits[i]));
+  pops += popcnt;
+
+  return (pops << 1) - num_of_bits;
 }
 
 

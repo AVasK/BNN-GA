@@ -4,10 +4,12 @@
 #include "binmat.hpp"
 #include "BNN.hpp"
 
+#include "CommonToolkit.hpp"
+
 int main()
 {
-  /*
-  auto size = 5;
+
+  auto size = 25;
   auto bv = BinVec(size);
   auto bw = BinVec(size);
 
@@ -17,14 +19,15 @@ int main()
   //bv[0] = 1;
   std::cout << bv << "\n";
   std::cout << bw << "\n";
+  std::cout << "Dot:\n";
   std::cout << bv*bw << "\n";
   std::cout << bv+bw << "\n";
 
   std::cout << 1 * bv;
   std::cout << 0 * bv;
   std::cout << "\n";
-  */
 
+  /*
   std::cout << "mask: " << to_binary(mask_last(4), 32) << "\n";
 
   auto bv = BinVec(3);
@@ -43,9 +46,9 @@ int main()
   {
     std::cout << (bv*mat)[idx] << " ";
   }
+  */
 
-
-  auto net = BNN(std::vector<int>({2,200,200,1}));
-  std::cout << net;
-  std::cout << net.forward(std::vector<int>({1,-1}));
+  auto net = BNN(std::vector<int>({2,20000,2000,1}));
+  std::cout << net.size() << " weights\n";
+  TIMEIT(net.forward(std::vector<int>({1,-1})), BNN_FORWARD);
 }
